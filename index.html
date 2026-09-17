@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maharashtra School Facilities Dashboard — PGI 2.0 &amp; PGI-D Live</title>
+<meta name="description" content="Maharashtra School Facilities Dashboard — PGI 2.0 and PGI-D indicators from UDISE+ school-level data.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <img class="mark" src="assets/logo.png" alt="Government of Maharashtra emblem">
+      <div>
+        <h1>School Facilities Dashboard — PGI 2.0 &amp; PGI-D Live</h1>
+        <div class="tag">UDISE+ AY 2026-27 · 108,095 schools · school-level drilldown</div>
+      </div>
+    </div>
+    <div class="role-tabs">
+      <button class="active" data-role="state">State</button>
+      <button data-role="district">District</button>
+      <button data-role="block">Block</button>
+    </div>
+  </div>
+
+  <div class="fw-bar">
+    <button class="fw-tab active" data-fw="district">District PGI-D<span class="sub">149 of 600 pts covered</span></button>
+    <button class="fw-tab" data-fw="state">State PGI 2.0<span class="sub">205 of 1,000 pts covered</span></button>
+  </div>
+
+  <div class="filterbar">
+    <div class="fgroup">
+      <label>District</label>
+      <select id="fDistrict"><option value="ALL">All Districts</option></select>
+    </div>
+    <div class="fgroup">
+      <label>Block</label>
+      <select id="fBlock" disabled><option value="ALL">All Blocks</option></select>
+    </div>
+    <div class="fgroup">
+      <label>Management</label>
+      <select id="fMgmt">
+        <option value="ALL">All</option>
+        <option value="Government">Government</option>
+        <option value="Aided">Aided</option>
+        <option value="Private/Unaided">Private / Unaided</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label>School Type</label>
+      <select id="fType">
+        <option value="ALL">All</option>
+        <option value="Primary Only">Primary Only</option>
+        <option value="Upper Primary">Upper Primary</option>
+        <option value="Secondary">Secondary</option>
+        <option value="Higher Secondary">Higher Secondary</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label>Locality</label>
+      <select id="fLoc">
+        <option value="ALL">All</option>
+        <option value="Rural">Rural</option>
+        <option value="Urban">Urban</option>
+      </select>
+    </div>
+    <div class="fgroup" style="flex:1; min-width:0;">
+      <label>Find a School</label>
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6B7D" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="schoolSearch" placeholder="School name or UDISE code…" autocomplete="off">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <label>&nbsp;</label>
+      <button class="reset-link" id="resetBtn">Reset all filters</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="pagehead">
+      <div>
+        <div class="breadcrumb" id="breadcrumb">Maharashtra <b>› All Districts</b></div>
+        <div class="role-note" id="roleNote">Statewide view — compare districts, then drill into blocks and individual schools.</div>
+      </div>
+      <div class="scope-pill" id="scopePill">108,095 schools in scope</div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi accent">
+        <div class="label" id="kpiScoreLabel">Covered PGI-D Score</div>
+        <div class="value" id="kpiScore">— <small>/ 149</small></div>
+      </div>
+      <div class="kpi">
+        <div class="label">Achievement</div>
+        <div class="value" id="kpiPct">—%</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Schools in Selection</div>
+        <div class="value" id="kpiSchools">—</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Govt + Aided Schools</div>
+        <div class="value" id="kpiGA">—</div>
+      </div>
+    </div>
+
+    <div class="bonus-row" id="bonusRow"></div>
+
+    <section id="schoolProfile" class="card">
+      <div class="sp-head">
+        <div>
+          <div class="sp-title" id="spName">—</div>
+          <div class="sp-meta" id="spMeta"></div>
+        </div>
+        <div class="sp-scores" id="spScores"></div>
+      </div>
+      <div class="sp-subhead">District PGI-D Indicators</div>
+      <div class="sp-grid" id="spGridDistrict"></div>
+      <div class="sp-subhead">State PGI 2.0 Indicators</div>
+      <div class="sp-grid" id="spGridState"></div>
+      <div class="sp-bonus" id="spBonus"></div>
+    </section>
+
+    <section>
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-title" id="drillTitle">District Ranking</div>
+          <div class="section-sub" id="drillSub">Click a bar to drill in.</div>
+          <div id="drillChart"></div>
+        </div>
+        <div class="card">
+          <div class="section-title" id="catTitle">Category Breakdown</div>
+          <div class="section-sub">Score within current selection</div>
+          <div id="catCards"></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="card">
+        <div class="section-title" id="indTitle">Indicator Detail — Current Selection</div>
+        <div class="section-sub">Click "Target Schools" on any row to list exactly which schools are not meeting it.</div>
+        <table>
+          <thead>
+            <tr><th>Code</th><th>Indicator</th><th class="num">Weight</th><th style="width:130px;">Achievement</th><th class="num">%</th><th class="num">Score</th><th></th></tr>
+          </thead>
+          <tbody id="indicatorBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="targetPanel" class="card">
+      <div class="target-head">
+        <div>
+          <div class="section-title" id="targetTitle">Target Schools</div>
+          <div class="section-sub" id="targetSub" style="margin-bottom:0;"></div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <div class="count-badge" id="targetCount">0 schools</div>
+          <button class="close-target" id="closeTarget">Close ✕</button>
+        </div>
+      </div>
+      <div class="target-toolbar">
+        <input type="text" id="targetSearch" placeholder="Filter by school name, UDISE code, or block…">
+        <button class="export-btn" id="exportBtn">⬇ Export CSV</button>
+      </div>
+      <div class="target-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable" data-k="name">School Name</th>
+              <th class="sortable" data-k="udise">UDISE Code</th>
+              <th class="sortable" data-k="dist">District</th>
+              <th class="sortable" data-k="block">Block</th>
+              <th class="sortable" data-k="locality">Village / Ward</th>
+              <th class="sortable" data-k="mgmt">Management</th>
+              <th class="sortable" data-k="type">School Type</th>
+            </tr>
+          </thead>
+          <tbody id="targetBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="note" id="footerNote"></footer>
+  </main>
+
+  <div id="appLoading"><div class="msg">Loading school data (108,095 schools)…</div></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
