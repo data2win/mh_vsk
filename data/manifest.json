@@ -1,0 +1,25 @@
+{
+  "description": "Maharashtra PGI dashboard data manifest. School rows are split across parts; concatenate in listed order.",
+  "rowSchema": [
+    "udise",
+    "name",
+    "distIdx",
+    "blockIdx",
+    "mgmtIdx",
+    "typeIdx",
+    "met",
+    "has5",
+    "met2",
+    "genderIdx",
+    "locIdx",
+    "locality"
+  ],
+  "lookups": "lookups.json",
+  "schoolParts": [
+    "schools-part-01.json",
+    "schools-part-02.json",
+    "schools-part-03.json",
+    "schools-part-04.json"
+  ],
+  "totalSchools": 108095
+}
